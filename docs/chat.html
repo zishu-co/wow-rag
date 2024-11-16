@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+	<script src="https://cdn.staticfile.org/vue/3.4.5/vue.global.js"></script>
+    <style type="text/css">
+        *{
+            padding: 0;
+            margin:0;
+        }
+        .box{
+            text-align: center;
+        }
+        .box>span{
+            color: red;
+            font-size: 18px;
+        }
+        .table-top{
+            margin-top: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .table-content{
+            margin:0 auto;
+        }
+        .table-content span{
+            background: #ff9900;
+            padding: 0 6px;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div style="margin:0 auto; height:10px;" class="col-md-8"></div>
+      <div id="chat">
+        <div class="group px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageList.filter((v) => v.role !== 'system')">
+          <div class="bold">{[ roleAlias[item.role] ]}：</div>
+          <div class="prose text-sm text-slate-600 leading-relaxed" style="white-space:pre-wrap;" v-if="item.content">
+            {[item.content]}
+          </div>
+          <div v-else>请等待...</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sticky bottom-0 w-full h-full p-6 pb-8 bg-gray-100">
+          <div class="flex">
+            <textarea
+              class="col-md-9 input form-control"
+              rows='5'
+              :placeholder="'请提问'"
+              v-model="messageContent"
+            ></textarea>
+            <br />
+            <button
+              type="primary"
+              class="btn rightbtn"
+              size="large"
+              :disabled="isTalking"
+              @click="send()"
+            >
+              发送
+            </button>
+          </div>
+          <br />
+          <br />
+          <br />
+        </div>
+      </div>
+</div>
+</body>
+
+<script type="text/javascript">
+async function fetchStream(param) {  
+    const url = `http://127.0.0.1:5000/stream_chat?param=${encodeURIComponent(param)}`;
+    const response = await fetch(url);  
+    const reader = response.body.getReader();  
+
+    while (true) {  
+        const { value, done } = await reader.read();  
+
+        if (done) {  
+            // 如果没有更多的数据可读，退出循环 
+            statusvue.isTalking=false;  
+            break; 
+            
+        }  
+
+        // 处理接收到的数据  
+        const text = new TextDecoder("utf-8").decode(value);  
+        let len = statusvue.messageList.length
+        statusvue.messageList[len-1].content += text; 
+            }  
+        } 
+
+const app = Vue.createApp({
+  data() {
+    return {
+      cdata:[1,0,0],
+      roleAlias:{"me":"我","GPT":"小助手","system":"机器人"},
+      messageList: [
+        {"role":"system","content":"你是一个人工智能答疑机器人"},
+        {"role":"GPT","content":"你好，需要什么帮助，尽管找我哦，有问必答！"},
+      ], 
+      isTalking:false,
+      messageContent: "", 
+    }
+  },
+  delimiters: ['{[', ']}'],
+
+  methods: {
+    send() {
+      this.messageList.push({"role":"me","content":this.messageContent});
+      var message = document.getElementById('chat');
+      message.scrollTop = message.scrollHeight;
+      statusvue.messageList.push({"role":"GPT","content":""});
+      this.isTalking=true;
+      console.log(this.messageContent);
+      fetchStream(this.messageContent);
+      this.messageContent='';
+    }
+  }
+})
+
+const statusvue = app.mount('#app')  
+</script>
+</html>
