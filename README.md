@@ -5,7 +5,7 @@ RAG(Retrieval Augmented Generation)是一种结合了检索和生成的AI技术�
 
 ## 项目内容
 - 第1课：手搓一个土得掉渣的RAG
-- 第2课：正式上路构建索引
+- 第2课：正式上路搞定模型
 - 第3课：初步体验问答引擎
 - 第4课：最脏最累的文档管理
 - 第5课：流式部署
@@ -16,6 +16,7 @@ RAG(Retrieval Augmented Generation)是一种结合了检索和生成的AI技术�
 - 如果你想参与到项目中来欢迎查看项目的 [Issue]() 查看没有被分配的任务。
 - 如果你发现了一些问题，欢迎在 [Issue]() 中进行反馈🐛。
 - 如果你对本项目感兴趣想要参与进来可以通过 [Discussion]() 进行交流💬。
+- 或者直接发邮件到zishuco@163.com
 
 如果你对 Datawhale 很感兴趣并想要发起一个新的项目，欢迎查看 [Datawhale 贡献指南](https://github.com/datawhalechina/DOPMC#%E4%B8%BA-datawhale-%E5%81%9A%E5%87%BA%E8%B4%A1%E7%8C%AE)。
 
@@ -25,7 +26,6 @@ RAG(Retrieval Augmented Generation)是一种结合了检索和生成的AI技术�
 | :----| :---- | :---- |
 | 黎伟 | 项目负责人 | datawhale成员 |
 
-*注：表头可自定义，但必须在名单中标明项目负责人*
 
 ## 关注我们
 
