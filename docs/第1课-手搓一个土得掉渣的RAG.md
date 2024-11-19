@@ -1,19 +1,23 @@
 欢迎来到wow-rag的第一课。在本课中，wow这个词的含义不是令人惊叹，而是土的掉渣。
 
-我们推荐用Jupyter Notebook来运行本教程的代码。请自己新建一个空白的可用的ipynb文件并打开。
+我们推荐用Jupyter Notebook来运行本教程的代码。可以先python -m venv myenv建立一个虚拟环境，然后激活这个虚拟环境。在虚拟环境中安装好Jupyter Notebook。
+请自己新建一个空白的可用的ipynb文件并打开。
 
 由于价格或者墙的原因，我们用着OpenAI的模型不是那么方便。不过openai的python库还是挺好用的，所以我们可以把openai的python库背后的模型换成国内的大模型。
 
 ### 安装依赖库
-运行本代码之前，你需要安装一些额外的依赖
+运行本代码之前，你需要安装一些额外的依赖。在Jupyter的格子中输入以下内容。
 
-!pip install faiss-cpu scikit-learn scipy
-!pip install openai
+%pip install faiss-cpu scikit-learn scipy
+%pip install openai
 
 然后我们就可以用国内模型的api_key和base_url来创建一个client了。
 
 国内模型可以是KIMI、智谱、Yi、deepseek等等。我们这里以智谱为例。
 
+新建一个keys.txt文件，里面填入两行字符串：
+第一个api_key
+第二个api_key
 
 ### 构造对话模型接口
 要想用openai库对接国内的大模型，只需要提供两个东西。第一是api_key，这个需要到各家的开放平台上去申请。第二就是base_url，一般是每家都有一个固定的地址，比如智谱的是https://open.bigmodel.cn/api/paas/v4/
@@ -87,8 +91,6 @@ print(n_vectors)
 
 ```python
 from sklearn.preprocessing import normalize
-
-
 def match_text(input_text, index, chunks, k=2):
     k = min(k, len(chunks))
 
@@ -100,18 +102,23 @@ def match_text(input_text, index, chunks, k=2):
     input_embedding = normalize(np.array([input_embedding]).astype('float32'))
 
     distances, indices = index.search(input_embedding, k)
-
+    matching_texts = ""
     for i, idx in enumerate(indices[0]):
         print(f"similarity: {distances[0][i]:.4f}\nmatching text: \n{chunks[idx]}\n")
+        matching_texts += f"similarity: {distances[0][i]:.4f}\nmatching text: \n{chunks[idx]}\n"
+
+    return matching_texts
 ```
 
 我们可以使用这个函数来检索一些文本。例如，我们可以检索一些与“Video Analytica dataset”最相似的文本块。
 
 ```python
-input_text = "What are the risks of Agent AI systems ?"
+input_text = "What are the applications of Agent AI systems ?"
 
 matched_texts = match_text(input_text=input_text, index=index, chunks=chunks, k=2)
 ```
+
+运行上面两行代码，将会得到如下输出：
 similarity: 0.6645
 matching text: 
 ystem and providing the user with controls in order to customize such a system. It is possible the Agent AI could be used to develop new methods to de
@@ -128,13 +135,11 @@ mental advances in agent AI help contribute towards these goals and many would b
 
 ```python
 prompt = f"""
-从文档
+根据找到的文档
 {matched_texts}
-中找问题
+生成
 {input_text}
-的答案，
-找到答案就仅使用文档语句回答，找不到答案就用自身知识回答并告诉用户该信息不是来自文档。
-不要复述问题，直接开始回答。
+的答案，尽可能使用文档语句的原文回答。不要复述问题，直接开始回答。
 """
 ```
 
@@ -162,4 +167,4 @@ get_completion_stream(prompt)
 
 得到如下回答：
 
-I'm sorry, but the document provided does not contain any information about the risks of Agent AI systems. Therefore, I cannot provide an answer based on the document alone. However, based on my knowledge, the risks of Agent AI systems can include unintended consequences, lack of transparency, potential misuse, and the potential for bias or discrimination in decision-making processes.
+Agent AI systems can be utilized to develop new methods and contribute to various goals, such as providing users with customized controls within a system. Additionally, these systems can help advance mental capabilities, potentially benefiting from a greater understanding of how to model embodied and empathetic interactions.

@@ -43,8 +43,6 @@ class OpenAIEmbeddingModelType(str, Enum):
     TEXT_EMBED_3_LARGE = "text-embedding-3-large"
     TEXT_EMBED_3_SMALL = "text-embedding-3-small"
     EMBED_2 = "embedding-2"
-    QWEN = "qwen2:7b"
-    BGE_LARGE = "bge-large"
 
 
 class OpenAIEmbeddingModeModel(str, Enum):
@@ -78,11 +76,7 @@ class OpenAIEmbeddingModeModel(str, Enum):
 
     # text-embedding-3-small
     TEXT_EMBED_3_SMALL = "text-embedding-3-small"
-
-    # embedding-2
     EMBED_2 = "embedding-2"
-    QWEN = "qwen2:7b"
-    BGE_LARGE = "bge-large"
 
 
 # convenient shorthand
@@ -109,8 +103,6 @@ _QUERY_MODE_MODEL_DICT = {
     (OAEM.TEXT_SEARCH_MODE, "text-embedding-3-large"): OAEMM.TEXT_EMBED_3_LARGE,
     (OAEM.TEXT_SEARCH_MODE, "text-embedding-3-small"): OAEMM.TEXT_EMBED_3_SMALL,
     (OAEM.TEXT_SEARCH_MODE, "embedding-2"): OAEMM.EMBED_2,
-    (OAEM.TEXT_SEARCH_MODE, "qwen2:7b"): OAEMM.QWEN,
-    (OAEM.TEXT_SEARCH_MODE, "bge-large"): OAEMM.BGE_LARGE,
 }
 
 _TEXT_MODE_MODEL_DICT = {
@@ -129,8 +121,6 @@ _TEXT_MODE_MODEL_DICT = {
     (OAEM.TEXT_SEARCH_MODE, "text-embedding-3-large"): OAEMM.TEXT_EMBED_3_LARGE,
     (OAEM.TEXT_SEARCH_MODE, "text-embedding-3-small"): OAEMM.TEXT_EMBED_3_SMALL,
     (OAEM.TEXT_SEARCH_MODE, "embedding-2"): OAEMM.EMBED_2,
-    (OAEM.TEXT_SEARCH_MODE, "qwen2:7b"): OAEMM.QWEN,
-    (OAEM.TEXT_SEARCH_MODE, "bge-large"): OAEMM.BGE_LARGE,
 }
 
 
