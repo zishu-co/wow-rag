@@ -10,34 +10,75 @@
 
 %pip install faiss-cpu scikit-learn scipy
 %pip install openai
+%pip install dotenv
+
+
+如果有显卡，可以安装faiss gpu版本，需要使用faiss-gpu包
+
 
 然后我们就可以用国内模型的api_key和base_url来创建一个client了。
 
-国内模型可以是KIMI、智谱、Yi、deepseek等等。我们这里以智谱为例。
+国内模型可以是智谱、Yi、千问deepseek等等。KIMI是不行的，因为Kimi家没有嵌入模型。
+要想用openai库对接国内的大模型，对于每个厂家，我们都需要准备四样前菜：
+第一：一个api_key，这个需要到各家的开放平台上去申请。
+第二：一个base_url，这个需要到各家的开放平台上去拷贝。
+第三：他们家的对话模型名称。
+第四：他们家的嵌入模型名称。
 
-新建一个keys.txt文件，里面填入两行字符串：
-第一个api_key
-第二个api_key
+在这四样东西里面，第一个api_key你要好好保密，不要泄露出去。免得被人盗用，让你的余额用光光。
 
-### 构造对话模型接口
-要想用openai库对接国内的大模型，只需要提供两个东西。第一是api_key，这个需要到各家的开放平台上去申请。第二就是base_url，一般是每家都有一个固定的地址，比如智谱的是https://open.bigmodel.cn/api/paas/v4/
+后面三样东西都是公开的。
 
+比如对于智谱：
+base_url = "https://open.bigmodel.cn/api/paas/v4/"
+chat_model = "glm-4-flash"
+emb_model = "embedding-2"
+
+智谱最新的嵌入式向量模型也可以使用embedding-3,然后维度变量d就是2048了。
+
+对于阿里的千问：
+base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+chat_model = "qwen-plus"
+emb_model = "text-embedding-v3"
+
+
+
+我们这里以智谱为例。
+
+在项目的根目录新建一个txt文件，把文件名改成.env。
+里面填入一行字符串：
+ZHIPU_API_KEY=你的api_key
+
+把ZHIPU_API_KEY写到.env的原因是为了保密，同时可以方便地在不同的代码中读取。
+
+咱们现在先把四样前菜准备一下吧：
+```python
+import os
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
+# 从环境变量中读取api_key
+api_key = os.getenv('ZHIPU_API_KEY')
+base_url = "https://open.bigmodel.cn/api/paas/v4/"
+chat_model = "glm-4-flash"
+emb_model = "embedding-2"
+```
+
+### 构造client
+构造client只需要两个东西：api_key和base_url。
 ```python
 from openai import OpenAI
-# 从文件导入所需要的secret keys
-# keys.txt这文件要提前自己建好，本教程是使用第二行的这个key
-with open('keys.txt', 'r', encoding='utf-8') as f:  
-    keylist = f.read().split('\n')
 client = OpenAI(
-    api_key=keylist[1],
-    base_url="https://open.bigmodel.cn/api/paas/v4/"
+    api_key = api_key,
+    base_url = base_url
 )
 ```
 
 有了这个client，我们就可以去实现各种能力了。
 
 ### 构造文档
-对文章进行切分后存入到数据库。我们选取了来自AGENT AI: SURVEYING THE HORIZONS OF MULTIMODAL INTERACTION的部分文章段落并进行嵌入。 由于文章太长，我们先要对文章进行切分。在这里，我们使用没有任何优化的顺序切分器，将文章分成了 150 个字符一段的小文本块。
+由于RAG的原理是先在文档中搜索，把搜索到最接近的内容喂给大模型，让大模型根据喂给它的内容进行回答，因此需要存储文档块，便于检索。这需要对文章进行切分后存入到数据库。我们选取了来自AGENT AI: SURVEYING THE HORIZONS OF MULTIMODAL INTERACTION的部分文章段落并进行嵌入。 由于文章太长，我们先要对文章进行切分。在这里，我们使用没有任何优化的顺序切分器，将文章分成了 150 个字符一段的小文本块。
 
 ```python
 import numpy as np
@@ -56,58 +97,99 @@ We will dedicate a segment of our project to discussing these ethical issues, ex
 
 """
 
+# 设置每个文本块的大小为 150 个字符
 chunk_size = 150
+# 使用列表推导式将长文本分割成多个块，每个块的大小为 chunk_size
 chunks = [embedding_text[i:i + chunk_size] for i in range(0, len(embedding_text), chunk_size)]
 ```
 
 ### 向量化
-接着，我们将这些小文本块进行 Embedding，得到一个 1024 维的向量。然后，我们将这些向量存入到一个向量数据库中，以便后续进行检索。
+我们把每一个文档进行向量化，通过对比向量的余弦相似度，可以找到与提出问题最接近的文档片段。接着，我们将这些小文本块进行 Embedding，得到一个 1024 维的向量。向量化我们需要用到前面的emb_model，然后，我们将这些向量存入到一个向量数据库中，以便后续进行检索。
 
 ```python
 from sklearn.preprocessing import normalize
 import numpy as np
 import faiss
 
+# 初始化一个空列表来存储每个文本块的嵌入向量
 embeddings = []
+
+# 遍历每个文本块
 for chunk in chunks:
+    # 使用 OpenAI API 为当前文本块创建嵌入向量
     response = client.embeddings.create(
-        model="embedding-2",
+        model=emb_model,
         input=chunk,
     )
+    
+    # 将嵌入向量添加到列表中
     embeddings.append(response.data[0].embedding)
+
+# 使用 sklearn 的 normalize 函数对嵌入向量进行归一化处理
 normalized_embeddings = normalize(np.array(embeddings).astype('float32'))
-d = 1024
+
+# 获取嵌入向量的维度
+d = len(embeddings[0])
+
+# 创建一个 Faiss 索引，用于存储和检索嵌入向量
 index = faiss.IndexFlatIP(d)
+
+# 将归一化后的嵌入向量添加到索引中
 index.add(normalized_embeddings)
 
+# 获取索引中的向量总数
 n_vectors = index.ntotal
+
 
 print(n_vectors)
 ```
 可以看到23块文本转化成了23个向量。
 
-我们可以使用向量数据库进行检索。下面代码实现了一个名为match_text的函数，其目的是在一个文本集合中找到与给定输入文本最相似的文本块。
+我们可以使用向量数据库进行检索。向量检索同样需要用到前面的emb_model。下面代码实现了一个名为match_text的函数，其目的是在一个文本集合中找到与给定输入文本最相似的文本块。
 其中 k是要返回的相似文本块的数量。
 
 ```python
 from sklearn.preprocessing import normalize
 def match_text(input_text, index, chunks, k=2):
+    """
+    在给定的文本块集合中，找到与输入文本最相似的前k个文本块。
+
+    参数:
+        input_text (str): 要匹配的输入文本。
+        index (faiss.Index): 用于搜索的Faiss索引。
+        chunks (list of str): 文本块的列表。
+        k (int, optional): 要返回的最相似文本块的数量。默认值为2。
+
+    返回:
+        str: 格式化的字符串，包含最相似的文本块及其相似度。
+    """
+    # 确保k不超过文本块的总数
     k = min(k, len(chunks))
 
+    # 使用OpenAI API为输入文本创建嵌入向量
     response = client.embeddings.create(
-        model="embedding-2",
+        model=emb_model,
         input=input_text,
     )
+    # 获取输入文本的嵌入向量
     input_embedding = response.data[0].embedding
+    # 对输入嵌入向量进行归一化处理
     input_embedding = normalize(np.array([input_embedding]).astype('float32'))
 
+    # 在索引中搜索与输入嵌入向量最相似的k个向量
     distances, indices = index.search(input_embedding, k)
+    # 初始化一个字符串来存储匹配的文本
     matching_texts = ""
+    # 遍历搜索结果
     for i, idx in enumerate(indices[0]):
+        # 打印每个匹配文本块的相似度和文本内容
         print(f"similarity: {distances[0][i]:.4f}\nmatching text: \n{chunks[idx]}\n")
+        # 将相似度和文本内容添加到匹配文本字符串中
         matching_texts += f"similarity: {distances[0][i]:.4f}\nmatching text: \n{chunks[idx]}\n"
 
+    # 返回包含匹配文本块及其相似度的字符串
     return matching_texts
+
 ```
 
 我们可以使用这个函数来检索一些文本。例如，我们可以检索一些与“Video Analytica dataset”最相似的文本块。
@@ -144,19 +226,38 @@ prompt = f"""
 ```
 
 ### 构建对话引擎
+
+生成对话需要用到前面的chat_model。
 ```python
 def get_completion_stream(prompt):
+    """
+    使用 OpenAI 的 Chat Completions API 生成流式的文本回复。
+
+    参数:
+        prompt (str): 要生成回复的提示文本。
+
+    返回:
+        None: 该函数直接打印生成的回复内容。
+    """
+    # 使用 OpenAI 的 Chat Completions API 创建一个聊天完成请求
     response = client.chat.completions.create(
-        model="glm-4-flash",  # 填写需要调用的模型名称
+        model=chat_model,  # 填写需要调用的模型名称
         messages=[
             {"role": "user", "content": prompt},
         ],
         stream=True,
     )
+    # 如果响应存在
     if response:
+        # 遍历响应中的每个块
         for chunk in response:
+            # 获取当前块的内容
             content = chunk.choices[0].delta.content
-            print(content, end='', flush=True)
+            # 如果内容存在
+            if content:
+                # 打印内容，并刷新输出缓冲区
+                print(content, end='', flush=True)
+
 ```
 
 接下来就可以去调用这个方法流式得到回答了
