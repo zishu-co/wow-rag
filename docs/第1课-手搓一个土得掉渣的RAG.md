@@ -7,11 +7,11 @@
 
 ### 安装依赖库
 运行本代码之前，你需要安装一些额外的依赖。在Jupyter的格子中输入以下内容。
-
+```bash
 %pip install faiss-cpu scikit-learn scipy
 %pip install openai
-%pip install dotenv
-
+%pip install python-dotenv
+```
 
 如果有显卡，可以安装faiss gpu版本，需要使用faiss-gpu包
 
@@ -20,36 +20,38 @@
 
 国内模型可以是智谱、Yi、千问deepseek等等。KIMI是不行的，因为Kimi家没有嵌入模型。
 要想用openai库对接国内的大模型，对于每个厂家，我们都需要准备四样前菜：
-第一：一个api_key，这个需要到各家的开放平台上去申请。
-第二：一个base_url，这个需要到各家的开放平台上去拷贝。
-第三：他们家的对话模型名称。
-第四：他们家的嵌入模型名称。
+- 第一：一个api_key，这个需要到各家的开放平台上去申请。
+- 第二：一个base_url，这个需要到各家的开放平台上去拷贝。
+- 第三：他们家的对话模型名称。
+- 第四：他们家的嵌入模型名称。
 
 在这四样东西里面，第一个api_key你要好好保密，不要泄露出去。免得被人盗用，让你的余额用光光。
 
 后面三样东西都是公开的。
 
 比如对于智谱：
+```python
 base_url = "https://open.bigmodel.cn/api/paas/v4/"
 chat_model = "glm-4-flash"
 emb_model = "embedding-2"
-
+```
 智谱最新的嵌入式向量模型也可以使用embedding-3,然后维度变量d就是2048了。
 
 对于阿里的千问：
+```python
 base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 chat_model = "qwen-plus"
 emb_model = "text-embedding-v3"
-
+```
 
 
 我们这里以智谱为例。
 
-在项目的根目录新建一个txt文件，把文件名改成.env。
+在项目的根目录新建一个txt文件，把文件名改成.env。需要注意的是，前面这个点儿不能省略。因为这个文件就叫做dotenv，dot就是点儿的意思。
 里面填入一行字符串：
 ZHIPU_API_KEY=你的api_key
 
-把ZHIPU_API_KEY写到.env的原因是为了保密，同时可以方便地在不同的代码中读取。
+把ZHIPU_API_KEY写到.env文件的原因是为了保密，同时可以方便地在不同的代码中读取。
 
 咱们现在先把四样前菜准备一下吧：
 ```python
@@ -81,9 +83,6 @@ client = OpenAI(
 由于RAG的原理是先在文档中搜索，把搜索到最接近的内容喂给大模型，让大模型根据喂给它的内容进行回答，因此需要存储文档块，便于检索。这需要对文章进行切分后存入到数据库。我们选取了来自AGENT AI: SURVEYING THE HORIZONS OF MULTIMODAL INTERACTION的部分文章段落并进行嵌入。 由于文章太长，我们先要对文章进行切分。在这里，我们使用没有任何优化的顺序切分器，将文章分成了 150 个字符一段的小文本块。
 
 ```python
-import numpy as np
-import faiss
-
 embedding_text = """
 Multimodal Agent AI systems have many applications. In addition to interactive AI, grounded multimodal models could help drive content generation for bots and AI agents, and assist in productivity applications, helping to re-play, paraphrase, action prediction or synthesize 3D or 2D scenario. Fundamental advances in agent AI help contribute towards these goals and many would benefit from a greater understanding of how to model embodied and empathetic in a simulate reality or a real world. Arguably many of these applications could have positive benefits.
 
