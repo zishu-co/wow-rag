@@ -1,130 +1,205 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>Chat</title>
-	<script src="https://cdn.staticfile.org/vue/3.4.5/vue.global.js"></script>
-    <style type="text/css">
-        *{
-            padding: 0;
-            margin:0;
-        }
-        .box{
-            text-align: center;
-        }
-        .box>span{
-            color: red;
-            font-size: 18px;
-        }
-        .table-top{
-            margin-top: 20px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .table-content{
-            margin:0 auto;
-        }
-        .table-content span{
-            background: #ff9900;
-            padding: 0 6px;
-            color: #fff;
-            cursor: pointer;
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://ai-public.mastergo.com/gen_page/tailwind-custom.css" rel="stylesheet"/>
+    <style id="animation-styles"> 
+        @keyframes gradient { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
+    <script src="https://ai-public.mastergo.com/gen_page/tailwind-config.min.js" data-color="#AC1BF5" data-border-radius="medium"></script>
+    <script src="https://cdn.staticfile.org/vue/3.4.5/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-<div id="app">
-    <div style="margin:0 auto; height:10px;" class="col-md-8"></div>
-      <div id="chat">
-        <div class="group px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageList.filter((v) => v.role !== 'system')">
-          <div class="bold">{[ roleAlias[item.role] ]}：</div>
-          <div class="prose text-sm text-slate-600 leading-relaxed" style="white-space:pre-wrap;" v-if="item.content">
-            {[item.content]}
-          </div>
-          <div v-else>请等待...</div>
+    <div id="splash" class="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <h1 class="text-7xl font-[&#39;Pacifico&#39;] text-white opacity-0 transition-opacity duration-1000 animate-bounce">
+            Wow! It's WOW-RAG!
+        </h1>
+    </div>
+    <div id="app" class="hidden h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-purple-100 bg-[size:400%_400%] relative overflow-hidden">
+        <div class="absolute inset-0 animate-[gradient_10s_linear_infinite] z-0">
+            <div class="animate-pulse absolute w-64 h-64 bg-custom/10 rounded-full -top-32 -left-32"></div>
+            <div class="animate-pulse absolute w-96 h-96 bg-blue-200/20 rounded-full -bottom-48 -right-48"></div>
         </div>
-      </div>
-
-      <div>
-        <div class="sticky bottom-0 w-full h-full p-6 pb-8 bg-gray-100">
-          <div class="flex">
-            <textarea
-              class="col-md-9 input form-control"
-              rows='5'
-              :placeholder="'请提问'"
-              v-model="messageContent"
-            ></textarea>
-            <br />
-            <button
-              type="primary"
-              class="btn rightbtn"
-              size="large"
-              :disabled="isTalking"
-              @click="send()"
-            >
-              发送
-            </button>
-          </div>
-          <br />
-          <br />
-          <br />
+        <div class="absolute top-4 right-4 flex items-center space-x-4 z-10">
+            <div class="flex items-center bg-white/80 rounded-lg p-2 backdrop-blur-sm">
+                <button id="playPauseBtn" class="text-custom hover:text-custom/80">
+                    <i class="fas fa-play"></i>
+                </button>
+                <input type="range" id="volumeSlider" class="mx-2 w-20" min="0" max="100" value="50"/>
+                <span id="volumeIcon" class="text-custom">
+                    <i class="fas fa-volume-up"></i>
+                </span>
+            </div>
         </div>
-      </div>
-</div>
-</body>
+        <div class="container mx-auto h-full max-w-4xl px-4 py-6 flex flex-col">
+            <div id="chatContainer" class="flex-1 overflow-y-auto mb-4 space-y-4 h-[calc(100%-120px)] z-20">
+                <div v-for="item in messageList.filter((v) => v.role !== 'system')" class="flex" :class="{ 'justify-start': item.role === 'me', 'justify-end': item.role !== 'me' }">
+                    <div class="max-w-[70%] space-y-1">
+                        <div class="text-xs text-gray-500">{[ roleAlias[item.role] ]}</div>
+                        <div class="rounded-lg p-3 shadow-sm" :class="{'bg-custom text-white': item.role !== 'me', 'bg-white': item.role === 'me'}">
+                            <p v-html="markdownToHtml(item.content)"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-lg">
+                <div class="flex items-center space-x-2">
+                    <button class="text-gray-500 hover:text-custom">
+                        <i class="far fa-smile text-xl"></i>
+                    </button>
+                    <textarea
+                        id="messageInput"
+                        class="flex-1 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400"
+                        placeholder="请输入您的问题..."
+                        v-model="messageContent"
+                        rows="3"
+                    ></textarea>
+                    <button id="sendButton" class="bg-custom text-white px-4 py-2 rounded-lg hover:bg-custom/80 transition-colors !rounded-button" @click="send()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <audio id="bgMusic" loop="">
+        <source src="greetings.mp3" type="audio/mp3"/>
+    </audio>
+    <script>
+        async function fetchStream(param) {  
+            const url = `http://127.0.0.1:5000/stream_chat?param=${encodeURIComponent(param)}`;
+            const response = await fetch(url);  
+            const reader = response.body.getReader();  
 
-<script type="text/javascript">
-async function fetchStream(param) {  
-    const url = `http://127.0.0.1:5000/stream_chat?param=${encodeURIComponent(param)}`;
-    const response = await fetch(url);  
-    const reader = response.body.getReader();  
+            while (true) {  
+                const { value, done } = await reader.read();  
 
-    while (true) {  
-        const { value, done } = await reader.read();  
+                if (done) {  
+                    statusvue.isTalking = false;  
+                    break; 
+                }  
 
-        if (done) {  
-            // 如果没有更多的数据可读，退出循环 
-            statusvue.isTalking=false;  
-            break; 
-            
-        }  
-
-        // 处理接收到的数据  
-        const text = new TextDecoder("utf-8").decode(value);  
-        let len = statusvue.messageList.length
-        statusvue.messageList[len-1].content += text; 
+                const text = new TextDecoder("utf-8").decode(value);  
+                let len = statusvue.messageList.length;
+                statusvue.messageList[len-1].content += text; 
             }  
-        } 
+        }
 
-const app = Vue.createApp({
-  data() {
-    return {
-      cdata:[1,0,0],
-      roleAlias:{"me":"我","GPT":"小助手","system":"机器人"},
-      messageList: [
-        {"role":"system","content":"你是一个人工智能答疑机器人"},
-        {"role":"GPT","content":"你好，需要什么帮助，尽管找我哦，有问必答！"},
-      ], 
-      isTalking:false,
-      messageContent: "", 
-    }
-  },
-  delimiters: ['{[', ']}'],
+        const app = Vue.createApp({
+            data() {
+                return {
+                    cdata: [1, 0, 0],
+                    roleAlias: { "me": "我", "GPT": "小助手", "system": "机器人" },
+                    messageList: [
+                        { "role": "system", "content": "你是一个人工智能答疑机器人,擅长借助RAG文档帮助用户进行问题回答" },
+                        { "role": "GPT", "content": "您好！我是WOW-RAG智能助手，很高兴为您服务。" },
+                    ],
+                    isTalking: false,
+                    messageContent: "",
+                }
+            },
+            delimiters: ['{[', ']}'],
+            methods: {
+                send() {
+                    const userMessage = this.messageContent.trim();
+                    if (!userMessage) return;
 
-  methods: {
-    send() {
-      this.messageList.push({"role":"me","content":this.messageContent});
-      var message = document.getElementById('chat');
-      message.scrollTop = message.scrollHeight;
-      statusvue.messageList.push({"role":"GPT","content":""});
-      this.isTalking=true;
-      console.log(this.messageContent);
-      fetchStream(this.messageContent);
-      this.messageContent='';
-    }
-  }
-})
+                    // 添加用户消息
+                    this.messageList.push({ "role": "me", "content": userMessage });
+                    const message = document.getElementById('chatContainer');
+                    message.scrollTop = message.scrollHeight;
 
-const statusvue = app.mount('#app')  
-</script>
+                    // 添加助手消息占位符
+                    this.messageList.push({ "role": "GPT", "content": "" });
+                    this.isTalking = true;
+
+                    // 发送请求
+                    fetchStream(userMessage).then(() => {
+                        this.isTalking = false;
+                    });
+
+                    this.messageContent = '';
+                },
+                // 新增方法：将 Markdown 转换为 HTML
+                markdownToHtml(markdown) {
+                    return marked.parse(markdown);
+                }
+            }
+        })
+
+        const statusvue = app.mount('#app');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const splash = document.getElementById('splash');
+            const app = document.getElementById('app');
+            const splashText = splash.querySelector('h1');
+            const bgMusic = document.getElementById('bgMusic');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeIcon = document.getElementById('volumeIcon');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatContainer = document.getElementById('chatContainer');
+
+            setTimeout(() => {
+                splashText.style.opacity = '1';
+            }, 100);
+
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                splash.style.transition = 'opacity 1s';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    app.classList.remove('hidden');
+                }, 1000);
+            }, 2000);
+
+            playPauseBtn.addEventListener('click', () => {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    bgMusic.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+
+            volumeSlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                bgMusic.volume = value / 100;
+                updateVolumeIcon(value);
+            });
+
+            function updateVolumeIcon(value) {
+                let icon = 'fa-volume-up';
+                if (value == 0) icon = 'fa-volume-mute';
+                else if (value < 50) icon = 'fa-volume-down';
+                volumeIcon.innerHTML = `<i class="fas ${icon}"></i>`;
+            }
+
+            sendButton.addEventListener('click', () => {
+                const message = messageInput.value.trim();
+                if (message) {
+                    statusvue.send();
+                }
+            });
+
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+        });
+    </script>
+</body>
 </html>

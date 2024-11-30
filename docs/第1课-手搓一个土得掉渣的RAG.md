@@ -8,9 +8,9 @@
 ### 安装依赖库
 运行本代码之前，你需要安装一些额外的依赖。在Jupyter的格子中输入以下内容。
 ```bash
-%pip install faiss-cpu scikit-learn scipy
-%pip install openai
-%pip install python-dotenv
+%pip install faiss-cpu scikit-learn scipy 
+%pip install openai 
+%pip install python-dotenv 
 ```
 
 如果有显卡，可以安装faiss gpu版本，需要使用faiss-gpu包
@@ -20,10 +20,10 @@
 
 国内模型可以是智谱、Yi、千问deepseek等等。KIMI是不行的，因为Kimi家没有嵌入模型。
 要想用openai库对接国内的大模型，对于每个厂家，我们都需要准备四样前菜：
-- 第一：一个api_key，这个需要到各家的开放平台上去申请。
-- 第二：一个base_url，这个需要到各家的开放平台上去拷贝。
-- 第三：他们家的对话模型名称。
-- 第四：他们家的嵌入模型名称。
+- 第一：一个api_key，这个需要到各家的开放平台上去申请。 
+- 第二：一个base_url，这个需要到各家的开放平台上去拷贝。 
+- 第三：他们家的对话模型名称。 
+- 第四：他们家的嵌入模型名称。 
 
 在这四样东西里面，第一个api_key你要好好保密，不要泄露出去。免得被人盗用，让你的余额用光光。
 
