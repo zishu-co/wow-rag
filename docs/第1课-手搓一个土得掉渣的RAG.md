@@ -268,3 +268,5 @@ get_completion_stream(prompt)
 得到如下回答：
 
 Agent AI systems can be utilized to develop new methods and contribute to various goals, such as providing users with customized controls within a system. Additionally, these systems can help advance mental capabilities, potentially benefiting from a greater understanding of how to model embodied and empathetic interactions.
+
+鸣谢：本节内容参考了官方glm-cookbook的章节：Using ZhipuAI Embedding API to get the embedding of a text
