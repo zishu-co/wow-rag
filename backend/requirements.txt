@@ -1,0 +1,15 @@
+faiss-cpu
+scikit-learn
+scipy
+openai
+python-dotenv
+pydantic
+llama-index-core
+llama-index-embeddings-zhipuai
+llama-index-llms-zhipuai
+llama-index-readers-file
+llama-index-vector-stores-faiss
+llamaindex-py-client
+fastapi
+requests
+uvicorn

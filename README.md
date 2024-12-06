@@ -3,7 +3,52 @@
 
 RAG(Retrieval Augmented Generation)是一种结合了检索和生成的AI技术框架。它通过从知识库中检索相关信息来增强大语言模型的生成能力,可以帮助模型生成更准确、更可靠的回答。本项目旨在探索和实现RAG技术,包括文档处理、向量检索、prompt engineering等核心模块,帮助开发者更好地理解和应用RAG技术。
 
-## 项目内容
+## 快速体验RAG
+
+- 第一步：克隆仓库到本地
+```bash
+git clone https://github.com/datawhalechina/wow-rag.git
+```
+
+- 第二步：用python自带的venv模块创建虚拟环境
+推荐使用python3.9以上版本。
+在wow-rag目录下打开终端，运行以下命令：
+```bash
+python -m venv rag-venv
+```
+
+- 第三步：激活Windows虚拟环境
+在第二步的终端环境中，运行以下命令：
+```bash
+.\rag-venv\Scripts\activate
+```
+
+
+- 第四步：安装依赖
+输入`cd backend`，进入到wow-rag/backend目录下，运行以下命令：
+```bash
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+- 第五步：配置环境变量
+在wow-rag/backend目录下创建一个.env文件，添加以下内容：
+```bash
+ZHIPU_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+其中，ZHIPU_API_KEY是智谱的API密钥，你可以在智谱官网注册并获取。
+
+- 第六步：运行后端服务
+在wow-rag/backend目录下打开终端，运行以下命令：
+```bash
+python main.py
+```
+
+- 第七步：运行前端页面
+在wow-rag/frontend目录下双击chat.html，在文本框中输入问题，然后点击发送按钮即可体验流式对话。
+
+
+
+## 课程内容
 - 第1课：手搓一个土得掉渣的RAG
 - 第2课：正式上路搞定模型
 - 第3课：初步体验问答引擎
