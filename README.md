@@ -3,6 +3,8 @@
 
 RAG(Retrieval Augmented Generation)是一种结合了检索和生成的AI技术框架。它通过从知识库中检索相关信息来增强大语言模型的生成能力,可以帮助模型生成更准确、更可靠的回答。本项目旨在探索和实现RAG技术,包括文档处理、向量检索、prompt engineering等核心模块,帮助开发者更好地理解和应用RAG技术。
 
+秉持着自塾（zishu.co）学用合一的理念，有教程必有产品，wow-rag会同时打造RAG的教程和产品。学到的知识用来打造产品，打造产品用到的知识总结进教程。我们将会为企业打造一个系列的极简、跨平台、易定制的RAG产品。
+
 ## 快速体验RAG
 
 - 第一步：克隆仓库到本地
@@ -31,11 +33,12 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 - 第五步：配置环境变量
-在wow-rag/backend目录下创建一个.env文件，添加以下内容：
+在wow-rag/backend目录下创建一个txt文件，添加以下内容：
 ```bash
 ZHIPU_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 其中，ZHIPU_API_KEY是智谱的API密钥，你可以在智谱官网注册并获取。
+然后把这个txt文件改名为.env，记住就是四个字符：点儿env，没别的。这就叫dotenv。
 
 - 第六步：运行后端服务
 在wow-rag/backend目录下打开终端，运行以下命令：
@@ -69,6 +72,15 @@ python main.py
 - 或者直接发邮件到zishuco@163.com
 
 如果你对 Datawhale 很感兴趣并想要发起一个新的项目，欢迎查看 [Datawhale 贡献指南](https://github.com/datawhalechina/DOPMC#%E4%B8%BA-datawhale-%E5%81%9A%E5%87%BA%E8%B4%A1%E7%8C%AE)。
+
+
+## 待做清单
+- [x] 美化chat.html
+- [ ] 解决“快速体验RAG”最后一步流式输出失灵的问题
+- [ ] 把cs-408考研科目的计算机网络和操作系统做到docs里边
+- [ ] 用Qdrant做后端磁盘保存的向量数据库
+
+
 
 ## 贡献者名单
 
