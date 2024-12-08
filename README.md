@@ -7,7 +7,7 @@ RAG(Retrieval Augmented Generation)是一种结合了检索和生成的AI技术�
 
 ## 快速体验RAG
 
-- 第一步：克隆仓库到本地
+- 第一步：克隆仓库到本地，克隆后，可以麻烦给我们点个star吗？鼓励我们做得更好！
 ```bash
 git clone https://github.com/datawhalechina/wow-rag.git
 ```
@@ -48,6 +48,13 @@ python main.py
 
 - 第七步：运行前端页面
 在wow-rag/frontend目录下双击chat.html，在文本框中输入问题，然后点击发送按钮即可体验流式对话。
+或者，在wow-rag/frontend目录下打开终端，输入这行代码：
+```bash
+python -m http.server 8080 --bind 0.0.0.0
+```
+然后在浏览器中输127.0.0.1:8080/chat.html即可体验流式对话。
+
+
 
 
 
@@ -78,7 +85,13 @@ python main.py
 - [x] 美化chat.html
 - [ ] 解决“快速体验RAG”最后一步流式输出失灵的问题
 - [ ] 把cs-408考研科目的计算机网络和操作系统做到docs里边
+- [ ] 把cs-408考研科目的计算机组成和数据结构做到docs里边
 - [ ] 用Qdrant做后端磁盘保存的向量数据库
+- [ ] 在Linux云电脑跑本教程的说明
+- [ ] 申请零一万物的36元额度的说明
+- [ ] chat.html输出消息后让页面自动滚动到最底部
+- [ ] 如果先运行main.py，再打开chat.html，会卡。反之就不卡，解决这个bug。
+
 
 
 
