@@ -9,7 +9,7 @@ app.add_middleware(CORSMiddleware,allow_origins=["*"])
 async def stream_chat(param:str = "你好"):
     # 我们假设query_engine已经构建完成
     response_stream = query_engine.query(param) 
-    async def generate():  
+    def generate():  
         for text in response_stream.response_gen:
             yield text
     return StreamingResponse(generate(), media_type='text/event-stream')  

@@ -83,10 +83,10 @@ python -m http.server 8080 --bind 0.0.0.0
 
 ## 待做清单
 - [x] 美化chat.html
-- [ ] 解决“快速体验RAG”最后一步流式输出失灵的问题
-- [ ] 把cs-408考研科目的计算机网络和操作系统做到docs里边
+- [x] 解决“快速体验RAG”最后一步流式输出失灵的问题
+- [x] 把cs-408考研科目的计算机网络和操作系统做到docs里边
 - [ ] 把cs-408考研科目的计算机组成和数据结构做到docs里边
-- [ ] 用Qdrant做后端磁盘保存的向量数据库
+- [x] 用Qdrant做后端磁盘保存的向量数据库
 - [ ] 在Linux云电脑跑本教程的说明
 - [ ] 申请零一万物的36元额度的说明
 - [ ] chat.html输出消息后让页面自动滚动到最底部
@@ -103,6 +103,9 @@ python -m http.server 8080 --bind 0.0.0.0
 | [坐看云起](https://github.com/netbuddy) | 贡献者 | 内测学员，第2课智谱官方包接口 |
 | [阿鲁](https://github.com/abchbx) | 贡献者 | 内测学员，第2课自定义模型接口 |
 | [吴小龙](https://github.com/LouisCanBe) | 贡献者 | 内测学员，第5课美化chat.html |
+| [宏辉](https://github.com/cheunghonghui) | 贡献者 | 助教，第2课构建自塾开放API服务 |
+| [胡琦](https://github.com/hu-qi) | 贡献者 | 助教，后端engine.py接入自塾开放API服务 |
+| [邢思宇](https://github.com/xiaoyuhuv) | 贡献者 | 塾员，计网和操作系统的文档 |
 
 ## 关注我们
 

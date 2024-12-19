@@ -9,7 +9,9 @@ llama-index-embeddings-zhipuai
 llama-index-llms-zhipuai
 llama-index-readers-file
 llama-index-vector-stores-faiss
+llama-index-vector-stores-qdrant
 llamaindex-py-client
+qdrant-client
 fastapi
 requests
 uvicorn
