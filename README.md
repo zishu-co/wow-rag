@@ -32,21 +32,13 @@ python -m venv rag-venv
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
-- 第五步：配置环境变量
-在wow-rag/backend目录下创建一个txt文件，添加以下内容：
-```bash
-ZHIPU_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-其中，ZHIPU_API_KEY是智谱的API密钥，你可以在智谱官网注册并获取。
-然后把这个txt文件改名为.env，记住就是四个字符：点儿env，没别的。这就叫dotenv。
-
-- 第六步：运行后端服务
+- 第五步：运行后端服务
 在wow-rag/backend目录下打开终端，运行以下命令：
 ```bash
 python main.py
 ```
 
-- 第七步：运行前端页面
+- 第六步：运行前端页面
 在wow-rag/frontend目录下双击chat.html，在文本框中输入问题，然后点击发送按钮即可体验流式对话。
 或者，在wow-rag/frontend目录下打开终端，输入这行代码：
 ```bash
