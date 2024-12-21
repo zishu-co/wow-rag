@@ -31,17 +31,7 @@
             <div class="animate-pulse absolute w-64 h-64 bg-custom/10 rounded-full -top-32 -left-32"></div>
             <div class="animate-pulse absolute w-96 h-96 bg-blue-200/20 rounded-full -bottom-48 -right-48"></div>
         </div>
-        <div class="absolute top-4 right-4 flex items-center space-x-4 z-10">
-            <div class="flex items-center bg-white/80 rounded-lg p-2 backdrop-blur-sm">
-                <button id="playPauseBtn" class="text-custom hover:text-custom/80">
-                    <i class="fas fa-play"></i>
-                </button>
-                <input type="range" id="volumeSlider" class="mx-2 w-20" min="0" max="100" value="50"/>
-                <span id="volumeIcon" class="text-custom">
-                    <i class="fas fa-volume-up"></i>
-                </span>
-            </div>
-        </div>
+        
         <div class="container mx-auto h-full max-w-4xl px-4 py-6 flex flex-col">
             <div id="chatContainer" class="flex-1 overflow-y-auto mb-4 space-y-4 h-[calc(100%-120px)] z-20">
                 <div v-for="item in messageList.filter((v) => v.role !== 'system')" class="flex" :class="{ 'justify-start': item.role === 'me', 'justify-end': item.role !== 'me' }">
@@ -72,9 +62,6 @@
             </div>
         </div>
     </div>
-    <audio id="bgMusic" loop="">
-        <source src="greetings.mp3" type="audio/mp3"/>
-    </audio>
     <script>
         async function fetchStream(param) {  
             const url = `http://127.0.0.1:5000/stream_chat?param=${encodeURIComponent(param)}`;
@@ -143,7 +130,6 @@
             const splash = document.getElementById('splash');
             const app = document.getElementById('app');
             const splashText = splash.querySelector('h1');
-            const bgMusic = document.getElementById('bgMusic');
             const playPauseBtn = document.getElementById('playPauseBtn');
             const volumeSlider = document.getElementById('volumeSlider');
             const volumeIcon = document.getElementById('volumeIcon');
@@ -164,21 +150,7 @@
                 }, 1000);
             }, 2000);
 
-            playPauseBtn.addEventListener('click', () => {
-                if (bgMusic.paused) {
-                    bgMusic.play();
-                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                } else {
-                    bgMusic.pause();
-                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-                }
-            });
 
-            volumeSlider.addEventListener('input', (e) => {
-                const value = e.target.value;
-                bgMusic.volume = value / 100;
-                updateVolumeIcon(value);
-            });
 
             function updateVolumeIcon(value) {
                 let icon = 'fa-volume-up';
